@@ -8,26 +8,48 @@ int main(int argc, char** argv )
         return -1;
     }
     Mat image;
-    image = imread( argv[1], 1 );
+    image = imread( argv[1], 1);
 
+    Mat *cudaImage;
+    cudaMallocManaged(&cudaImage, image.total() * image.elemSize());
+    memcpy(cudaImage, &image, image.total() * image.elemSize());
     if ( !image.data )
     {
         printf("No image data \n");
         return -1;
     }
     
-    Mat blurImage = detectLine(image);
+    grayscale(cudaImage);
 
     namedWindow("Display Image", WINDOW_AUTOSIZE );
     imshow("Display Image", blurImage);
     waitKey(0);
 
+
+    cudaFree(cudaImage);
     return 0;
 }
 
+__global__
+void grayscale(Mat *cudaImage) {
+    Mat image = *cudaImage;
 
-Mat grayscale(Mat image) {
+    int index = threadIdx.x;
+    int stride = blockDim.x;
+
+    int numPixels = image.rows * image.cols;
+
     Mat grayImage(image.rows, image.cols, CV_8UC1);
+
+    for (int i = index; i < numPixels; i+= stride) {
+        int y = index / image.cols;
+        int x = index % image.cols;
+        Vec3b intensity = image.at<Vec3b>(y,x);
+        grayImage.at<uchar>(y,x) = (.3*intensity[2]) + (.59 * intensity[1]) + (.11 * intensity[0]);
+    }
+    grayImage.copyTo(image);
+
+    /*
     for(int x = 0; x < grayImage.cols; x++) {
         for (int y = 0; y < grayImage.rows; y++) {
             Vec3b intensity = image.at<Vec3b>(y, x);
@@ -35,10 +57,15 @@ Mat grayscale(Mat image) {
         }
     }
     return grayImage;
+    */
 }
 
+__device__
 int* kernelSum(Mat image, int x, int y, int size) {
-    int *sum = (int*)calloc(3, sizeof(int));
+
+    int *sum = (int*)malloc(3* sizeof(int));
+    memset(sum, 0, sizeof(int)*3)
+
     int numPixels = 0;
     for (int i = (x - (size/2)); i < (x + (size/2))+1; i++) {
         for (int j = (y - (size/2)); j < (y + (size/2))+1; j++) {
@@ -57,8 +84,30 @@ int* kernelSum(Mat image, int x, int y, int size) {
     return sum;
 }
 
-Mat blur(Mat image, int size) {
+__global__
+void blur(Mat *cudaImage, int size) {
+
+    Mat image = *cudaImage;
+
+    int index = threadIdx.x;
+    int stride = blockDim.x;
+
+    int numPixels = image.rows * image.cols;
+
     Mat blurImage = image.clone();
+
+    for (int i = index; i < numPixels; i += stride) {
+        int y = index / image.cols;
+        int x = index % image.cols;
+
+        int *average = kernelSum(image, x, y, size);
+        blurImage.at<Vec3b>(y, x)[0] = average[0];
+        blurImage.at<Vec3b>(y, x)[1] = average[1];
+        blurImage.at<Vec3b>(y, x)[2] = average[2];
+    }
+    blurImage.copyTo(image);
+
+    /*
     for(int x = 0; x < image.cols; x++) {
         for (int y = 0; y < image.rows; y++) {
             int *average = kernelSum(image, x, y, size);
@@ -68,8 +117,10 @@ Mat blur(Mat image, int size) {
         } 
     }
     return blurImage;
+    */
 }
 
+__device__
 int kernelLineDetect(Mat image, int x, int y) {
     int sum = 0;
     int numPixels = 0;
@@ -91,13 +142,33 @@ int kernelLineDetect(Mat image, int x, int y) {
     return sum / (numPixels*4);
 }
 
-Mat detectLine(Mat image) {
-    Mat grayImage = grayscale(image);
-    Mat lineImage = grayImage.clone();
+__global__
+Mat detectLine(Mat *cudaImage) {
+    //Assuming gray image input
+
+    Mat image = *cudaImage;
+
+    int index = threadIdx.x;
+    int stride = blockDim.x;
+
+    int numPixels = image.rows * image.cols;
+
+    Mat lineImage = image.clone();
+
+    for(int i = index; i < numPixels; i+= stride) {
+        int y = index / image.cols;
+        int x = index % image.cols;
+
+        lineImage.at<uchar>(y, x) = kernelLineDetect(image, x, y);
+    }
+    lineImage.copyTo(image);
+
+    /*
     for(int x = 0; x < image.cols; x++) {
         for (int y = 0; y < image.rows; y++) {
             lineImage.at<uchar>(y, x) = kernelLineDetect(grayImage, x, y);
         } 
     }
     return lineImage;
+    */
 }
