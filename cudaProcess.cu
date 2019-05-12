@@ -61,7 +61,7 @@ void execCudaBlur(unsigned char* image, unsigned char* blurImage, int rows, int 
 }
 
 __device__
-void cudaKernelLineDetect(unsigned char image, int rows, int cols, int x, int y, int* val) {
+void cudaKernelLineDetect(unsigned char* image, int rows, int cols, int x, int y, int* val) {
     int sum = 0;
     int numPixels = 0;
     int kx = 0;
@@ -82,19 +82,20 @@ void cudaKernelLineDetect(unsigned char image, int rows, int cols, int x, int y,
 }
 
 __global__
-Mat execCudaDetectLine(unsigned char* image, unsigned char* lineImage, int rows, int cols, int channels, int step) {
+void execCudaDetectLine(unsigned char* image, unsigned char* lineImage, int rows, int cols, int channels, int step) {
     //Assuming gray image input
 
     int index = threadIdx.x;
     int stride = blockDim.x;
 
-    int numPixels = image.rows * image.cols;
+    int numPixels = rows * cols;
+    int *val;
 
     for(int i = index; i < numPixels; i+= stride) {
-        int y = index / image.cols;
-        int x = index % image.cols;
-
-        lineImage[x + cols*y] = cudaKernelLineDetect(image, rows, cols, x, y);
+        int y = index / cols;
+        int x = index % cols;
+        cudaKernelLineDetect(image, rows, cols, x, y, val);
+        lineImage[x + cols*y] = *val;
     }
 }
 
