@@ -51,13 +51,9 @@ void execCudaBlur(unsigned char* image, unsigned char* blurImage, int rows, int 
 }
 
 __device__
-void cudaKernelLineDetect(unsigned char* image, int rows, int cols, int x, int y, int* val) {
+void cudaKernelLineDetect(unsigned char* image, int rows, int cols, int x, int y, int* val, int* cudaKernelArray) {
     int numPixels = 0;
     int kx = 0;
-    int cudaKernelArray[4][3][3] = {{{-1,-1,-1},{2,2,2},{-1,-1,-1}},
-                            {{-1,2,-1},{-1,2,-1},{-1,2,-1}},
-                            {{-1,-1,2},{-1,2,-1},{2,-1,-1}},
-                            {{2,-1,-1},{-1,2,-1},{-1,-1,2}}};
     for (int i = (x - 1); i < (x + 2); i++) {
         int ky = 0;
         for (int j = (y - 1); j < (y + 2); j++) {
@@ -75,7 +71,7 @@ void cudaKernelLineDetect(unsigned char* image, int rows, int cols, int x, int y
 }
 
 __global__
-void execCudaDetectLine(unsigned char* image, unsigned char* lineImage, int rows, int cols, int channels, int step) {
+void execCudaDetectLine(unsigned char* image, unsigned char* lineImage, int rows, int cols, int channels, int step, int* kernel) {
     //Assuming gray image input
 
     int index = threadIdx.x + (blockDim.x * blockIdx.x);
@@ -84,7 +80,7 @@ void execCudaDetectLine(unsigned char* image, unsigned char* lineImage, int rows
 
     int y = index / cols;
     int x = index % cols;
-    cudaKernelLineDetect(image, rows, cols, x, y, val);
+    cudaKernelLineDetect(image, rows, cols, x, y, val, kernel);
     lineImage[x + cols*y] = *val;
 }
 
@@ -147,13 +143,20 @@ unsigned char* cudaDetectLine(unsigned char* image, int rows, int cols, int chan
 
     unsigned char* cudaImage;
     unsigned char* cudaLineImage;
+    unsigned int* cudaKernelArrayMalloc;
     cudaMallocManaged(&cudaImage, sizeof(unsigned char)*rows*cols);
     cudaMallocManaged(&cudaLineImage, sizeof(unsigned char)*rows*cols);
-
+    cudaMallocManaged(&cudaKernelArrayMalloc, sizeof(int)*36);
+    
+    int cudaKernelArray[4][3][3] = {{{-1,-1,-1},{2,2,2},{-1,-1,-1}},
+                            {{-1,2,-1},{-1,2,-1},{-1,2,-1}},
+                            {{-1,-1,2},{-1,2,-1},{2,-1,-1}},
+                            {{2,-1,-1},{-1,2,-1},{-1,-1,2}}};
+    memcpy(cudaKernelArrayMalloc, cudaKernelArray, sizeof(int)*36);
     memcpy(cudaImage, grayImage, sizeof(unsigned char)*rows*cols);
     memset(cudaLineImage, 0, sizeof(unsigned char)*rows*cols);
 
-    execCudaDetectLine<<<numBlocks, threadsPerBlock>>>(cudaImage, cudaLineImage, rows, cols, channels, step);
+    execCudaDetectLine<<<numBlocks, threadsPerBlock>>>(cudaImage, cudaLineImage, rows, cols, channels, step, kernel);
     cudaDeviceSynchronize();
 
     unsigned char* lineImage = (unsigned char*)malloc(sizeof(unsigned char)*rows*cols);
@@ -161,6 +164,7 @@ unsigned char* cudaDetectLine(unsigned char* image, int rows, int cols, int chan
 
     cudaFree(cudaImage);
     cudaFree(cudaLineImage);
+    cudaFree(cudaKernelArrayMalloc);
     return lineImage;
 
 }
