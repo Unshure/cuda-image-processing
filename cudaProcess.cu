@@ -53,7 +53,7 @@ void execCudaBlur(unsigned char* image, unsigned char* blurImage, int rows, int 
         int y = index / cols;
         int x = index % cols;
 
-        cudaKernelSum(image, rows, cols, channels, step, x, y, 10, sum);
+        cudaKernelSum(image, rows, cols, channels, step, x, y, size, sum);
         blurImage[channels*x + step*y] =     sum[0];
         blurImage[channels*x + step*y + 1] = sum[1];
         blurImage[channels*x + step*y + 2] = sum[2];
