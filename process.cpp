@@ -31,6 +31,7 @@ int main(int argc, char** argv )
     }   else if (strcmp(argv[2], "-b") == 0 && argc == 4) {
         unsigned char* blurImageData = blur(image.data, image.rows, image.cols, image.channels(), image.step, atoi(argv[3]));
         processedImage = Mat(image.rows, image.cols, CV_8UC3, blurImageData);
+        
     }   else if (strcmp(argv[2], "-cuda") == 0) {
             if (strcmp(argv[3], "-l") == 0) {
                 unsigned char* lineImageData = cudaDetectLine(image.data, image.rows, image.cols, image.channels(), image.step);

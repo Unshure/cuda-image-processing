@@ -107,20 +107,20 @@ unsigned char* cudaGrayscale(unsigned char* image, int rows, int cols, int chann
 
     int threadsPerBlock = 1024;
     int numBlocks = 65000;
-        
+
     unsigned char* cudaImage;
     unsigned char* cudaGrayImage;
     cudaMallocManaged(&cudaImage, sizeof(unsigned char)*rows*cols);
     cudaMallocManaged(&cudaGrayImage, sizeof(unsigned char)*rows*cols*channels);
     
-    memcpy(cudaImage, image, sizeof(unsigned char)*rows*cols*channels);
+    cudaMemcpy(cudaImage, image, sizeof(unsigned char)*rows*cols*channels, cudaMemcpyHostToDevice);
     memset(cudaGrayImage, 0, sizeof(unsigned char)*rows*cols);
 
     execCudaGrayscale<<<numBlocks, threadsPerBlock>>>(cudaImage, cudaGrayImage, rows, cols, channels, step);
     cudaDeviceSynchronize();
 
     unsigned char* grayImage = (unsigned char*)malloc(sizeof(unsigned char)*rows*cols);
-    memcpy(grayImage, cudaGrayImage, sizeof(unsigned char)*rows*cols);
+    cudaMemcpy(grayImage, cudaGrayImage, sizeof(unsigned char)*rows*cols, cudaMemcpyDeviceToHost);
 
     cudaFree(cudaImage);
     cudaFree(cudaGrayImage);
@@ -138,14 +138,14 @@ unsigned char* cudaBlur(unsigned char* image, int rows, int cols, int channels, 
     cudaMallocManaged(&cudaImage, sizeof(unsigned char)*rows*cols*channels);
     cudaMallocManaged(&cudaBlurImage, sizeof(unsigned char)*rows*cols*channels);
 
-    memcpy(cudaImage, image, sizeof(unsigned char)*rows*cols*channels);
+    cudaMemcpy(cudaImage, image, sizeof(unsigned char)*rows*cols*channels, cudaMemcpyHostToDevice);
     memset(cudaBlurImage, 0, sizeof(unsigned char)*rows*cols*channels);
 
     execCudaBlur<<<numBlocks, threadsPerBlock>>>(cudaImage, cudaBlurImage, rows, cols, channels, step, size);
     cudaDeviceSynchronize();
 
     unsigned char* blurImage = (unsigned char*)malloc(sizeof(unsigned char)*rows*cols*channels);
-    memcpy(blurImage, cudaBlurImage, sizeof(unsigned char)*rows*cols*channels);
+    cudaMemcpy(blurImage, cudaBlurImage, sizeof(unsigned char)*rows*cols*channels, cudaMemcpyDeviceToHost);
 
     cudaFree(cudaImage);
     cudaFree(cudaBlurImage);
@@ -165,14 +165,14 @@ unsigned char* cudaDetectLine(unsigned char* image, int rows, int cols, int chan
     cudaMallocManaged(&cudaImage, sizeof(unsigned char)*rows*cols);
     cudaMallocManaged(&cudaLineImage, sizeof(unsigned char)*rows*cols);
 
-    memcpy(cudaImage, grayImage, sizeof(unsigned char)*rows*cols);
+    cudaMemcpy(cudaImage, grayImage, sizeof(unsigned char)*rows*cols, cudaMemcpyHostToDevice);
     memset(cudaLineImage, 0, sizeof(unsigned char)*rows*cols);
 
     execCudaDetectLine<<<numBlocks, threadsPerBlock>>>(cudaImage, cudaLineImage, rows, cols, channels, step);
     cudaDeviceSynchronize();
 
     unsigned char* lineImage = (unsigned char*)malloc(sizeof(unsigned char)*rows*cols);
-    memcpy(lineImage, cudaLineImage, sizeof(unsigned char)*rows*cols);
+    cudaMemcpy(lineImage, cudaLineImage, sizeof(unsigned char)*rows*cols, cudaMemcpyDeviceToHost);
 
     cudaFree(cudaImage);
     cudaFree(cudaLineImage);
