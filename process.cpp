@@ -28,7 +28,7 @@ int main(int argc, char** argv )
         uchar* grayImageData = grayscale(image.data, image.rows, image.cols, image.channels(), image.step);
         processedImage = Mat(image.rows, image.cols, CV_8UC1, grayImageData);
         
-    }   else if (strcmp(argv[2], "-b") == 0) {
+    }   else if (strcmp(argv[2], "-b") == 0 && argc != 4) {
         uchar* blurImageData = blur(image.data, image.rows, image.cols, image.channels(), image.step, atoi(argv[3]));
         processedImage = Mat(image.rows, image.cols, CV_8UC3, blurImageData);
     }   else {
