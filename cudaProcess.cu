@@ -51,7 +51,7 @@ void execCudaBlur(unsigned char* image, unsigned char* blurImage, int rows, int 
 }
 
 __device__
-void cudaKernelLineDetect(unsigned char* image, int rows, int cols, int x, int y, int* val, int* cudaKernelArray) {
+void cudaKernelLineDetect(unsigned char* image, int rows, int cols, int x, int y, int* val, int cudaKernelArray[4][3][3]) {
     int numPixels = 0;
     int kx = 0;
     for (int i = (x - 1); i < (x + 2); i++) {
@@ -71,7 +71,7 @@ void cudaKernelLineDetect(unsigned char* image, int rows, int cols, int x, int y
 }
 
 __global__
-void execCudaDetectLine(unsigned char* image, unsigned char* lineImage, int rows, int cols, int channels, int step, int* kernel) {
+void execCudaDetectLine(unsigned char* image, unsigned char* lineImage, int rows, int cols, int channels, int step, int kernel[4][3][3]) {
     //Assuming gray image input
 
     int index = threadIdx.x + (blockDim.x * blockIdx.x);
