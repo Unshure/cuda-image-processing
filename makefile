@@ -11,7 +11,7 @@ clean:
 	rm -rf *.o process
 
 process: cudaProcess.o
-	$(CC) $(CFLAGS) `pkg-config --cflags --libs opencv` process.cpp -o process 
+	$(CC) $(CFLAGS)  process.cpp -o process $(LIBS)
 
 cudaProcess.o:
 	nvcc -c -arch=sm_20 cudaProcess.cu
