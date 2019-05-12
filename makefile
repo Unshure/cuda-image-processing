@@ -10,8 +10,8 @@ all: process
 clean:
 	rm -rf *.o process
 
-process: gpu.o
-	$(CC) $(CFLAGS) process.cpp -o process $(LIBS) gpu.o
+process: cudaProcess.o
+	$(CC) $(CFLAGS) process.cpp -o process $(LIBS) cudaProcess.o
 
-gpu.o:
+cudaProcess.o:
 	nvcc -c -arch=sm_70 cudaProcess.cu
