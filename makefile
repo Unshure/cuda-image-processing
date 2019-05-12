@@ -11,7 +11,7 @@ clean:
 	rm -rf *.o process
 
 process: cudaProcess.o
-	$(CC) -o process $(LIBS) -L/path/to/my/openCV/lib -lopencv_core -lopencv_imgcodecs -L/usr/lib/cuda/lib64 -lcuda -lcudart process.cpp cudaProcess.o
+	$(CC) -o process $(LIBS) -lcudart process.cpp cudaProcess.o
 
 cudaProcess.o:
 	nvcc -c -arch=sm_20 cudaProcess.cu
