@@ -68,10 +68,10 @@ int main(int argc, char** argv )
     elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
     printf("Time: %f\n", elapsed);
         
-    namedWindow("Display Image", WINDOW_AUTOSIZE );
+    //namedWindow("Display Image", WINDOW_AUTOSIZE );
 
-    imshow("Display Image", processedImage);
-    waitKey(0);
+    //imshow("Display Image", processedImage);
+    //waitKey(0);
 
     return 0;
 }
