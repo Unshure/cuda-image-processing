@@ -4,7 +4,7 @@ __global__
 void execCudaGrayscale(unsigned char* image, unsigned char* grayImage, int rows, int cols, int channels, int step) {
 
     int index = threadIdx.x + (blockDim.x * blockIdx.x);
-    int stride = blockDim.x;
+    // int stride = blockDim.x;
 
     // int numPixels = rows * cols;
 
@@ -43,12 +43,11 @@ __global__
 void execCudaBlur(unsigned char* image, unsigned char* blurImage, int rows, int cols, int channels, int step, int size) {
 
     int index = threadIdx.x + (blockDim.x * blockIdx.x);
-    int stride = blockDim.x;
+    // int stride = blockDim.x;
 
     // int numPixels = rows * cols;
 
-    int *sum = (int*)malloc(3 * sizeof(int));
-    memset(sum, 0, 3*sizeof(int));
+    int sum[3] = {0,0,0};
 
     //for (int i = index; i < numPixels; i += stride) {
         int y = index / cols;
@@ -91,7 +90,7 @@ void execCudaDetectLine(unsigned char* image, unsigned char* lineImage, int rows
     //Assuming gray image input
 
     int index = threadIdx.x + (blockDim.x * blockIdx.x);
-    int stride = blockDim.x;
+    // int stride = blockDim.x;
 
     //int numPixels = rows * cols;
     int *val;
