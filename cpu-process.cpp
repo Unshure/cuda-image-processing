@@ -1,5 +1,5 @@
 #include "process.hpp"
-#include "cudaProcess.h"
+//#include "cudaProcess.h"
 
 #include <ctime>
 
@@ -40,7 +40,7 @@ int main(int argc, char** argv )
         unsigned char* blurImageData = blur(image.data, image.rows, image.cols, image.channels(), image.step, atoi(argv[3]));
         processedImage = Mat(image.rows, image.cols, CV_8UC3, blurImageData);
 
-    }   else if (strcmp(argv[2], "-cuda") == 0) {
+    /*}   else if (strcmp(argv[2], "-cuda") == 0) {
             if (strcmp(argv[3], "-l") == 0) {
                 unsigned char* lineImageData = cudaDetectLine(image.data, image.rows, image.cols, image.channels(), image.step);
                 processedImage = Mat(image.rows, image.cols, CV_8UC1, lineImageData);
@@ -57,7 +57,7 @@ int main(int argc, char** argv )
             } else {
                 printf("Missing cuda tag\n");
                 return 0;
-            }
+            }*/
     }   else {
         printf("Missing tag\n");
         return 0;
