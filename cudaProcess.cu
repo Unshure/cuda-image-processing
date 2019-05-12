@@ -6,9 +6,9 @@ void execCudaGrayscale(unsigned char* image, unsigned char* grayImage, int rows,
     int index = threadIdx.x + (blockDim.x * blockIdx.x);
     int stride = blockDim.x;
 
-    int numPixels = rows * cols;
+    // int numPixels = rows * cols;
 
-    for (int i = index; i < numPixels; i+= stride) {
+    //for (int i = index; i < numPixels; i+= stride) {
         int y = index / cols;
         int x = index % cols;
 
@@ -17,18 +17,19 @@ void execCudaGrayscale(unsigned char* image, unsigned char* grayImage, int rows,
         int red = (int)image[channels*x + step*y + 2];
         
         grayImage[x + cols*y] = (unsigned char)(.3*red) + (.59 * green) + (.11 * blue);
-    }
+    //}
 }
 
 __device__
 void cudaKernelSum(unsigned char* image, int rows, int cols, int channels, int step, int x, int y, int size, int* sum) {
     int numPixels = 0;
+
     for (int i = (x - (size/2)); i < (x + (size/2))+1; i++) {
         for (int j = (y - (size/2)); j < (y + (size/2))+1; j++) {
             if (i >= 0 && j >= 0 && i < cols && j < rows) {
-                sum[0] += image[i*channels + y*step];
-                sum[1] += image[i*channels + y*step + 1];
-                sum[2] += image[i*channels + y*step + 2];
+                sum[0] += image[i*channels + j*step];
+                sum[1] += image[i*channels + j*step + 1];
+                sum[2] += image[i*channels + j*step + 2];
                 numPixels++;
             }
         }
@@ -44,12 +45,12 @@ void execCudaBlur(unsigned char* image, unsigned char* blurImage, int rows, int 
     int index = threadIdx.x + (blockDim.x * blockIdx.x);
     int stride = blockDim.x;
 
-    int numPixels = rows * cols;
+    // int numPixels = rows * cols;
 
     int *sum = (int*)malloc(3 * sizeof(int));
     memset(sum, 0, 3*sizeof(int));
 
-    for (int i = index; i < numPixels; i += stride) {
+    //for (int i = index; i < numPixels; i += stride) {
         int y = index / cols;
         int x = index % cols;
 
@@ -57,7 +58,7 @@ void execCudaBlur(unsigned char* image, unsigned char* blurImage, int rows, int 
         blurImage[channels*x + step*y] =     sum[0];
         blurImage[channels*x + step*y + 1] = sum[1];
         blurImage[channels*x + step*y + 2] = sum[2];
-    }
+    //}
 }
 
 __device__
@@ -92,15 +93,15 @@ void execCudaDetectLine(unsigned char* image, unsigned char* lineImage, int rows
     int index = threadIdx.x + (blockDim.x * blockIdx.x);
     int stride = blockDim.x;
 
-    int numPixels = rows * cols;
+    //int numPixels = rows * cols;
     int *val;
 
-    for(int i = index; i < numPixels; i+= stride) {
+    //for(int i = index; i < numPixels; i+= stride) {
         int y = index / cols;
         int x = index % cols;
         cudaKernelLineDetect(image, rows, cols, x, y, val);
         lineImage[x + cols*y] = *val;
-    }
+    //}
 }
 
 unsigned char* cudaGrayscale(unsigned char* image, int rows, int cols, int channels, int step) {
