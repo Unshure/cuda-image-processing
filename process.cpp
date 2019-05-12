@@ -1,6 +1,8 @@
 #include "process.hpp"
 #include "cudaProcess.h"
 
+#include <ctime>
+
 int main(int argc, char** argv )
 {
     if ( argc < 3 )
@@ -18,6 +20,12 @@ int main(int argc, char** argv )
     }
 
     Mat processedImage;
+
+    struct timespec start, finish;
+    double elapsed;
+    printf("-Starting Image Processor-\n");
+    // Start Timer
+    clock_gettime(CLOCK_MONOTONIC, &start);
 
     if (strcmp(argv[2], "-l") == 0) {
 
@@ -54,6 +62,11 @@ int main(int argc, char** argv )
         printf("Missing tag\n");
         return 0;
     }
+
+    clock_gettime(CLOCK_MONOTONIC, &finish);
+    elapsed = (finish.tv_sec - start.tv_sec);
+    elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
+    printf("Time: %f\n", elapsed);
         
     namedWindow("Display Image", WINDOW_AUTOSIZE );
 
