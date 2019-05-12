@@ -1,4 +1,5 @@
 #include "process.hpp"
+#include "cudaProcess.h"
 
 int main(int argc, char** argv )
 {

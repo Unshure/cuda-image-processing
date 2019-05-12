@@ -11,7 +11,7 @@ clean:
 	rm -rf *.o process
 
 process: cudaProcess.o
-	$(CC) $(CFLAGS) -o process $(LIBS) -L/usr/lib/cuda/lib64 -lcuda -lcudart process.cpp cudaProcess.o
+	$(CC) -o process $(LIBS) -L/usr/lib/cuda/lib64 -lcuda -lcudart process.cpp cudaProcess.o
 
 cudaProcess.o:
-	nvcc -c -arch=sm_70 cudaProcess.cu
+	nvcc -c -arch=sm_20 cudaProcess.cu
