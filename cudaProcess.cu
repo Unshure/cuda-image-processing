@@ -3,7 +3,7 @@
 __global__
 void execCudaGrayscale(unsigned char* image, unsigned char* grayImage, int rows, int cols, int channels, int step) {
 
-    int index = threadIdx.x;
+    int index = threadIdx.x + (blockDim.x * blockIdx.x);
     int stride = blockDim.x;
 
     int numPixels = rows * cols;
@@ -41,7 +41,7 @@ void cudaKernelSum(unsigned char* image, int rows, int cols, int channels, int s
 __global__
 void execCudaBlur(unsigned char* image, unsigned char* blurImage, int rows, int cols, int channels, int step, int size) {
 
-    int index = threadIdx.x;
+    int index = threadIdx.x + (blockDim.x * blockIdx.x);
     int stride = blockDim.x;
 
     int numPixels = rows * cols;
@@ -89,7 +89,7 @@ __global__
 void execCudaDetectLine(unsigned char* image, unsigned char* lineImage, int rows, int cols, int channels, int step) {
     //Assuming gray image input
 
-    int index = threadIdx.x;
+    int index = threadIdx.x + (blockDim.x * blockIdx.x);
     int stride = blockDim.x;
 
     int numPixels = rows * cols;
@@ -106,7 +106,7 @@ void execCudaDetectLine(unsigned char* image, unsigned char* lineImage, int rows
 unsigned char* cudaGrayscale(unsigned char* image, int rows, int cols, int channels, int step) {
 
     int threadsPerBlock = 1024;
-    int numBlocks = (rows*cols) / 1024;
+    int numBlocks = ((rows*cols) / 1024) + 1;
 
     unsigned char* cudaImage;
     unsigned char* cudaGrayImage;
@@ -131,7 +131,7 @@ unsigned char* cudaGrayscale(unsigned char* image, int rows, int cols, int chann
 unsigned char* cudaBlur(unsigned char* image, int rows, int cols, int channels, int step, int size) {
 
     int threadsPerBlock = 1024;
-    int numBlocks = 65000;
+    int numBlocks = ((rows*cols) / 1024) + 1;
 
     unsigned char* cudaImage;
     unsigned char* cudaBlurImage;
@@ -156,7 +156,7 @@ unsigned char* cudaBlur(unsigned char* image, int rows, int cols, int channels, 
 unsigned char* cudaDetectLine(unsigned char* image, int rows, int cols, int channels, int step) {
 
     int threadsPerBlock = 1024;
-    int numBlocks = 65000;
+    int numBlocks = ((rows*cols) / 1024) + 1;
 
     unsigned char* grayImage = cudaGrayscale(image, rows, cols, channels, step);
 
