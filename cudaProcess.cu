@@ -51,7 +51,7 @@ void execCudaBlur(unsigned char* image, unsigned char* blurImage, int rows, int 
 }
 
 __device__
-void cudaKernelLineDetect(unsigned char* image, int rows, int cols, int x, int y, int* val, int cudaKernelArray[4][3][3]) {
+void cudaKernelLineDetect(unsigned char* image, int rows, int cols, int x, int y, int* val, int (*cudaKernelArray)[3][3]) {
     int numPixels = 0;
     int kx = 0;
     for (int i = (x - 1); i < (x + 2); i++) {
@@ -71,7 +71,7 @@ void cudaKernelLineDetect(unsigned char* image, int rows, int cols, int x, int y
 }
 
 __global__
-void execCudaDetectLine(unsigned char* image, unsigned char* lineImage, int rows, int cols, int channels, int step, int kernel[4][3][3]) {
+void execCudaDetectLine(unsigned char* image, unsigned char* lineImage, int rows, int cols, int channels, int step, int (*kernel)[3][3]) {
     //Assuming gray image input
 
     int index = threadIdx.x + (blockDim.x * blockIdx.x);
@@ -143,7 +143,7 @@ unsigned char* cudaDetectLine(unsigned char* image, int rows, int cols, int chan
 
     unsigned char* cudaImage;
     unsigned char* cudaLineImage;
-    int*[3][3] cudaKernelArrayMalloc;
+    int* [3][3] cudaKernelArrayMalloc;
     cudaMallocManaged(&cudaImage, sizeof(unsigned char)*rows*cols);
     cudaMallocManaged(&cudaLineImage, sizeof(unsigned char)*rows*cols);
     cudaMallocManaged(&cudaKernelArrayMalloc, sizeof(int)*36);
