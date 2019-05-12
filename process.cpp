@@ -21,28 +21,28 @@ int main(int argc, char** argv )
 
     if (strcmp(argv[2], "-l") == 0) {
 
-        uchar* lineImageData = detectLine(image.data, image.rows, image.cols, image.channels(), image.step);
+        unsigned char* lineImageData = detectLine(image.data, image.rows, image.cols, image.channels(), image.step);
         processedImage = Mat(image.rows, image.cols, CV_8UC1, lineImageData);
         
     }   else if (strcmp(argv[2], "-g") == 0) {
-        uchar* grayImageData = grayscale(image.data, image.rows, image.cols, image.channels(), image.step);
+        unsigned char* grayImageData = grayscale(image.data, image.rows, image.cols, image.channels(), image.step);
         processedImage = Mat(image.rows, image.cols, CV_8UC1, grayImageData);
         
     }   else if (strcmp(argv[2], "-b") == 0 && argc == 4) {
-        uchar* blurImageData = blur(image.data, image.rows, image.cols, image.channels(), image.step, atoi(argv[3]));
+        unsigned char* blurImageData = blur(image.data, image.rows, image.cols, image.channels(), image.step, atoi(argv[3]));
         processedImage = Mat(image.rows, image.cols, CV_8UC3, blurImageData);
     }   else if (strcmp(argv[2], "-cuda") == 0) {
             if (strcmp(argv[3], "-l") == 0) {
-                uchar* lineImageData = cudaDetectLine(image.data, image.rows, image.cols, image.channels(), image.step);
+                unsigned char* lineImageData = cudaDetectLine(image.data, image.rows, image.cols, image.channels(), image.step);
                 processedImage = Mat(image.rows, image.cols, CV_8UC1, lineImageData);
 
             }   else if (strcmp(argv[3], "-g") == 0) {
-                uchar* grayImageData = cudaGrayscale(image.data, image.rows, image.cols, image.channels(), image.step);
+                unsigned char* grayImageData = cudaGrayscale(image.data, image.rows, image.cols, image.channels(), image.step);
                 processedImage = Mat(image.rows, image.cols, CV_8UC1, grayImageData);
 
                 
             }   else if (strcmp(argv[3], "-b") == 0 && argc == 5) {
-                uchar* blurImageData = cudaBlur(image.data, image.rows, image.cols, image.channels(), image.step, atoi(argv[3]));
+                unsigned char* blurImageData = cudaBlur(image.data, image.rows, image.cols, image.channels(), image.step, atoi(argv[3]));
                 processedImage = Mat(image.rows, image.cols, CV_8UC3, blurImageData);
 
             } else {
