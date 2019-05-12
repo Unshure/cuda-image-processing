@@ -2,7 +2,7 @@
 
 int main(int argc, char** argv )
 {
-    if ( argc != 2 )
+    if ( argc < 3 )
     {
         printf("usage: DisplayImage.out <Image_Path>\n");
         return -1;
@@ -15,38 +15,64 @@ int main(int argc, char** argv )
         printf("No image data \n");
         return -1;
     }
-    
-    Mat blurImage = detectLine(image);
 
+    Mat processedImage;
+
+    if (strcmp(argv[2], "-l") == 0) {
+
+        uchar* lineImageData = detectLine(image.data, image.rows, image.cols, image.channels(), image.step);
+        processedImage = Mat(image.rows, image.cols, CV_8UC1, lineImageData);
+        
+    }   else if (strcmp(argv[2], "-g") == 0) {
+        uchar* grayImageData = grayscale(image.data, image.rows, image.cols, image.channels(), image.step);
+        processedImage = Mat(image.rows, image.cols, CV_8UC1, grayImageData);
+        
+    }   else if (strcmp(argv[2], "-b") == 0) {
+        uchar* blurImageData = blur(image.data, image.rows, image.cols, image.channels(), image.step, atoi(argv[3]));
+        processedImage = Mat(image.rows, image.cols, CV_8UC3, blurImageData);
+    }   else {
+        printf("missing tag");
+        return 0;
+    }
+        
     namedWindow("Display Image", WINDOW_AUTOSIZE );
-    imshow("Display Image", blurImage);
+
+    imshow("Display Image", processedImage);
     waitKey(0);
 
     return 0;
 }
 
 
-Mat grayscale(Mat image) {
-    Mat grayImage(image.rows, image.cols, CV_8UC1);
-    for(int x = 0; x < grayImage.cols; x++) {
-        for (int y = 0; y < grayImage.rows; y++) {
-            Vec3b intensity = image.at<Vec3b>(y, x);
-            grayImage.at<uchar>(y, x) = (.3*intensity[2]) + (.59 * intensity[1]) + (.11 * intensity[0]);
+uchar* grayscale(uchar* image, int rows, int cols, int channels, int step) {
+    
+    uchar* grayImage = (uchar*)malloc(sizeof(uchar)*rows*cols);
+    memset(grayImage, 0, sizeof(uchar)*rows*cols);
+        
+    for(int y = 0; y < rows; y++) {
+        for (int x = 0; x < cols; x++) {
+            int blue = (int)image[channels*x + step*y];
+            int green = (int)image[channels*x + step*y + 1];
+            int red = (int)image[channels*x + step*y + 2];
+            
+            grayImage[x + cols*y] = (uchar)(.3*red) + (.59 * green) + (.11 * blue);
+
         }
     }
     return grayImage;
 }
 
-int* kernelSum(Mat image, int x, int y, int size) {
-    int *sum = (int*)calloc(3, sizeof(int));
+
+int* kernelSum(uchar* image, int rows, int cols, int channels, int step, int x, int y, int size) {
+    int *sum = (int*)malloc(3 * sizeof(int));
+    memset(sum, 0, 3*sizeof(int));
     int numPixels = 0;
     for (int i = (x - (size/2)); i < (x + (size/2))+1; i++) {
         for (int j = (y - (size/2)); j < (y + (size/2))+1; j++) {
-            if (i >= 0 && j >= 0 && i < image.cols && j < image.rows) {
-                Vec3b intensity = image.at<Vec3b>(j, i);
-                sum[0] += intensity[0];
-                sum[1] += intensity[1];
-                sum[2] += intensity[2];
+            if (i >= 0 && j >= 0 && i < cols && j < rows) {
+                sum[0] += image[i*channels + y*step];
+                sum[1] += image[i*channels + y*step + 1];
+                sum[2] += image[i*channels + y*step + 2];
                 numPixels++;
             }
         }
@@ -57,29 +83,34 @@ int* kernelSum(Mat image, int x, int y, int size) {
     return sum;
 }
 
-Mat blur(Mat image, int size) {
-    Mat blurImage = image.clone();
-    for(int x = 0; x < image.cols; x++) {
-        for (int y = 0; y < image.rows; y++) {
-            int *average = kernelSum(image, x, y, size);
-            blurImage.at<Vec3b>(y, x)[0] = average[0];
-            blurImage.at<Vec3b>(y, x)[1] = average[1];
-            blurImage.at<Vec3b>(y, x)[2] = average[2];
-        } 
+uchar* blur(uchar* image, int rows, int cols, int channels, int step, int size) {
+
+    uchar* blurImage = (uchar*)malloc(sizeof(uchar)*rows*cols*channels);
+    memset(blurImage, 0, sizeof(uchar)*rows*cols*channels);
+    
+        
+    for(int y = 0; y < rows; y++) {
+        for (int x = 0; x < cols; x++) {
+            int *average = kernelSum(image, rows, cols, channels, step, x, y, size);
+            blurImage[channels*x + step*y] =     average[0];
+            blurImage[channels*x + step*y + 1] = average[1];
+            blurImage[channels*x + step*y + 2] = average[2];
+        }
     }
     return blurImage;
 }
 
-int kernelLineDetect(Mat image, int x, int y) {
+
+int kernelLineDetect(uchar* image, int rows, int cols, int x, int y) {
     int sum = 0;
     int numPixels = 0;
     int kx = 0;
     for (int i = (x - 1); i < (x + 2); i++) {
         int ky = 0;
         for (int j = (y - 1); j < (y + 2); j++) {
-            if (i >= 0 && j >= 0 && i < image.cols && j < image.rows) {
+            if (i >= 0 && j >= 0 && i < cols && j < rows) {
                 for(int k = 0; k < 4; k ++) {
-                    sum += kernelArray[k][kx][ky] * image.at<uchar>(j, i);
+                    sum += kernelArray[k][kx][ky] * image[i + cols*j];
                 }
                 numPixels++;
             }
@@ -91,13 +122,18 @@ int kernelLineDetect(Mat image, int x, int y) {
     return sum / (numPixels*4);
 }
 
-Mat detectLine(Mat image) {
-    Mat grayImage = grayscale(image);
-    Mat lineImage = grayImage.clone();
-    for(int x = 0; x < image.cols; x++) {
-        for (int y = 0; y < image.rows; y++) {
-            lineImage.at<uchar>(y, x) = kernelLineDetect(grayImage, x, y);
-        } 
+uchar* detectLine(uchar* image, int rows, int cols, int channels, int step) {
+
+    uchar* lineImage = (uchar*)malloc(sizeof(uchar)*rows*cols);
+    memset(lineImage, 0, sizeof(uchar)*rows*cols);
+    
+    uchar* grayImage = grayscale(image, rows, cols, channels, step);
+        
+    for(int y = 0; y < rows; y++) {
+        for (int x = 0; x < cols; x++) {    
+            lineImage[x + cols*y] = kernelLineDetect(grayImage, rows, cols, x, y);
+        }
     }
     return lineImage;
 }
+

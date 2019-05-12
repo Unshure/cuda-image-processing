@@ -1,21 +1,19 @@
-CC=nvcc
-CCCpu = g++
+CC=g++
 
-CPUFLAGS=-g -Wall -std=c++11
+CFLAGS=-g -Wall -std=c++11
 
 OPENCV = `pkg-config opencv --cflags --libs`
 LIBS = $(OPENCV)
 
-CFLAGS=-std=c++11 -x cu
+HEADER=include/process.hpp
 
-HEADER=include/process.h
-
-default: process
+all: process
 
 clean:
-	rm process cudaProcess
+	rm -rf *.o process
 
-image:
-	$(CC) $(CFLAGS) process.cu -arch=compute_35 -o cudaProcess
-cpu:
-	$(CCCpu) $(CPUFLAGS) process.cpp -o process $(LIBS)
+process:
+	$(CC) $(CFLAGS) process.cpp -o process $(LIBS) gpu
+
+gpu:
+	nvcc -c -arch=sm_75 cudaProcess.cu
