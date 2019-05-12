@@ -104,7 +104,10 @@ void execCudaDetectLine(unsigned char* image, unsigned char* lineImage, int rows
 }
 
 unsigned char* cudaGrayscale(unsigned char* image, int rows, int cols, int channels, int step) {
-    
+
+    int threadsPerBlock = 1024;
+    int numBlocks = 65000;
+        
     unsigned char* cudaImage;
     unsigned char* cudaGrayImage;
     cudaMallocManaged(&cudaImage, sizeof(unsigned char)*rows*cols);
@@ -127,6 +130,9 @@ unsigned char* cudaGrayscale(unsigned char* image, int rows, int cols, int chann
 
 unsigned char* cudaBlur(unsigned char* image, int rows, int cols, int channels, int step, int size) {
 
+    int threadsPerBlock = 1024;
+    int numBlocks = 65000;
+
     unsigned char* cudaImage;
     unsigned char* cudaBlurImage;
     cudaMallocManaged(&cudaImage, sizeof(unsigned char)*rows*cols*channels);
@@ -148,6 +154,9 @@ unsigned char* cudaBlur(unsigned char* image, int rows, int cols, int channels, 
 }
 
 unsigned char* cudaDetectLine(unsigned char* image, int rows, int cols, int channels, int step) {
+
+    int threadsPerBlock = 1024;
+    int numBlocks = 65000;
 
     unsigned char* grayImage = cudaGrayscale(image, rows, cols, channels, step);
 

@@ -10,8 +10,5 @@ unsigned char* cudaBlur(unsigned char*, int, int, int, int, int);
 
 unsigned char* cudaDetectLine(unsigned char*, int, int, int, int);
 
-int threadsPerBlock = 1024;
-int numBlocks = 65000;
-
 
 #endif
