@@ -106,8 +106,10 @@ void execCudaDetectLine(unsigned char* image, unsigned char* lineImage, int rows
 unsigned char* cudaGrayscale(unsigned char* image, int rows, int cols, int channels, int step) {
 
     int threadsPerBlock = 1024;
-    int numBlocks = 65000;
-        
+    int numBlocks = (rows*cols) / 1024;
+
+    std::cout << numBlocks << std::endl;
+
     unsigned char* cudaImage;
     unsigned char* cudaGrayImage;
     cudaMallocManaged(&cudaImage, sizeof(unsigned char)*rows*cols);
