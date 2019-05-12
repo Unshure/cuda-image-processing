@@ -1,5 +1,8 @@
 #include "cudaProcess.h"
 
+#include <cuda.h>
+#include <cuda_runtime.h>
+
 __global__
 void execCudaGrayscale(unsigned char* image, unsigned char* grayImage, int rows, int cols, int channels, int step) {
 
