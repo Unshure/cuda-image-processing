@@ -1,4 +1,4 @@
-#include "runCuda.h"
+#include "cudaProcess.h"
 
 __global__
 void execCudaGrayscale(uchar* image, uchar* grayImage, int rows, int cols, int channels, int step) {
@@ -152,7 +152,7 @@ uchar* cudaDetectLine(uchar* image, int rows, int cols, int channels, int step) 
     uchar* cudaLineImage;
     cudaMallocManaged(cudaImage, sizeof(uchar)*rows*cols);
     cudaMallocManaged(cudaLineImage, sizeof(uchar)*rows*cols);
-    
+
     memcpy(cudaImage, grayImage, sizeof(uchar)*rows*cols)
     memset(cudaLineImage, 0, sizeof(uchar)*rows*cols);
 

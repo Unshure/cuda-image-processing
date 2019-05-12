@@ -12,8 +12,8 @@ all: process
 clean:
 	rm -rf *.o process
 
-process:
-	$(CC) $(CFLAGS) process.cpp -o process $(LIBS) gpu
+process: gpu.o
+	$(CC) $(CFLAGS) process.cpp -o process $(LIBS) gpu.o
 
-gpu:
-	nvcc -c -arch=sm_75 cudaProcess.cu
+gpu.o:
+	nvcc -c -arch=sm_70 cudaProcess.cu
