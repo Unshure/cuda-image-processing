@@ -152,10 +152,10 @@ unsigned char* cudaDetectLine(unsigned char* image, int rows, int cols, int chan
     cudaMallocManaged(&cudaImage, sizeof(unsigned char)*rows*cols);
     cudaMallocManaged(&cudaLineImage, sizeof(unsigned char)*rows*cols);
 
-    memcpy(cudaImage, grayImage, sizeof(unsigned char)*rows*cols)
+    memcpy(cudaImage, grayImage, sizeof(unsigned char)*rows*cols);
     memset(cudaLineImage, 0, sizeof(unsigned char)*rows*cols);
 
-    execCudaDetectLine<<<numBlocks, threadsPerBlock>>>(cudaImage, cudaLineImage, rows, cols, channels, step, size);
+    execCudaDetectLine<<<numBlocks, threadsPerBlock>>>(cudaImage, cudaLineImage, rows, cols, channels, step);
     cudaDeviceSynchronize();
 
     unsigned char* lineImage = (unsigned char*)malloc(sizeof(unsigned char)*rows*cols);
