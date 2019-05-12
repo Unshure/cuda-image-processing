@@ -5,8 +5,6 @@ CFLAGS=-g -Wall -std=c++11
 OPENCV = `pkg-config opencv --cflags --libs`
 LIBS = $(OPENCV)
 
-HEADER=include/process.hpp
-
 all: process
 
 clean:
