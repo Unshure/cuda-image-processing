@@ -39,7 +39,7 @@ void cudaKernelSum(unsigned char* image, int rows, int cols, int channels, int s
 }
 
 __global__
-void execCudaBlur(unsigned char* image, unsigned char* blurImage, int rows, int cols, int channels, int step int size) {
+void execCudaBlur(unsigned char* image, unsigned char* blurImage, int rows, int cols, int channels, int step, int size) {
 
     int index = threadIdx.x;
     int stride = blockDim.x;
@@ -70,7 +70,7 @@ void cudaKernelLineDetect(unsigned char image, int rows, int cols, int x, int y,
         for (int j = (y - 1); j < (y + 2); j++) {
             if (i >= 0 && j >= 0 && i < cols && j < rows) {
                 for(int k = 0; k < 4; k ++) {
-                    sum += kernelArray[k][kx][ky] * image[i + cols*j];
+                    sum += cudaKernelArray[k][kx][ky] * image[i + cols*j];
                 }
                 numPixels++;
             }
