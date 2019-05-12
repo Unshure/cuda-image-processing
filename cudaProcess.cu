@@ -1,8 +1,5 @@
 #include "cudaProcess.h"
 
-#include <cuda.h>
-#include <cuda_runtime.h>
-
 __global__
 void execCudaGrayscale(unsigned char* image, unsigned char* grayImage, int rows, int cols, int channels, int step) {
 
@@ -68,6 +65,10 @@ void cudaKernelLineDetect(unsigned char* image, int rows, int cols, int x, int y
     int sum = 0;
     int numPixels = 0;
     int kx = 0;
+    int cudaKernelArray[4][3][3] = {{{-1,-1,-1},{2,2,2},{-1,-1,-1}},
+                            {{-1,2,-1},{-1,2,-1},{-1,2,-1}},
+                            {{-1,-1,2},{-1,2,-1},{2,-1,-1}},
+                            {{2,-1,-1},{-1,2,-1},{-1,-1,2}}};
     for (int i = (x - 1); i < (x + 2); i++) {
         int ky = 0;
         for (int j = (y - 1); j < (y + 2); j++) {
