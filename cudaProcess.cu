@@ -21,8 +21,9 @@ void execCudaGrayscale(unsigned char* image, unsigned char* grayImage, int rows,
 }
 
 __device__
-void cudaKernelSum(unsigned char* image, int rows, int cols, int channels, int step, int x, int y, int size, int* sum) {
+int* cudaKernelSum(unsigned char* image, int rows, int cols, int channels, int step, int x, int y, int size) {
     int numPixels = 0;
+    int sum[3];
     for (int i = (x - (size/2)); i < (x + (size/2))+1; i++) {
         for (int j = (y - (size/2)); j < (y + (size/2))+1; j++) {
             if (i >= 0 && j >= 0 && i < cols && j < rows) {
@@ -36,6 +37,7 @@ void cudaKernelSum(unsigned char* image, int rows, int cols, int channels, int s
     sum[0] = sum[0] / numPixels;
     sum[1] = sum[1] / numPixels;
     sum[2] = sum[2] / numPixels;
+    return sum;
 }
 
 __global__
@@ -46,14 +48,13 @@ void execCudaBlur(unsigned char* image, unsigned char* blurImage, int rows, int 
 
     int numPixels = rows * cols;
 
-    int *sum = (int*)malloc(3 * sizeof(int));
-    memset(sum, 0, 3*sizeof(int));
+    int *sum;
 
     for (int i = index; i < numPixels; i += stride) {
         int y = index / cols;
         int x = index % cols;
 
-        cudaKernelSum(image, rows, cols, channels, step, x, y, size, sum);
+        sum = cudaKernelSum(image, rows, cols, channels, step, x, y, size);
         blurImage[channels*x + step*y] =     sum[0];
         blurImage[channels*x + step*y + 1] = sum[1];
         blurImage[channels*x + step*y + 2] = sum[2];
