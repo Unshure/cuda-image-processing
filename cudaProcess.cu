@@ -108,8 +108,6 @@ unsigned char* cudaGrayscale(unsigned char* image, int rows, int cols, int chann
     int threadsPerBlock = 1024;
     int numBlocks = (rows*cols) / 1024;
 
-    std::cout << numBlocks << std::endl;
-
     unsigned char* cudaImage;
     unsigned char* cudaGrayImage;
     cudaMallocManaged(&cudaImage, sizeof(unsigned char)*rows*cols);
