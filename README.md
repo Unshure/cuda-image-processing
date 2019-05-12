@@ -8,6 +8,8 @@ This is a set of image processing tools implemented in regular C++ and with Cuda
 ## Compiling the project
 Move into the main directory of this project and run the "make" command. A file nammed "process" should appear afterwards.
 
+If your computer does not have a gpu, you can still compile this project, it will just not have the gpu tools. In order to do this, run the command "make cpu" instead.
+
 ----------------------------------------
 ## Running the project
 The execution of this project is done with the following command and flags:
