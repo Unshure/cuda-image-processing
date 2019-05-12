@@ -11,7 +11,7 @@ clean:
 	rm -rf *.o process
 
 process: cudaProcess.o
-	$(CC) -o process $(LIBS) -lcudart process.cpp cudaProcess.o
+	$(CC) $(LIBS) -lcudart process.cpp cudaProcess.o -o process 
 
 cudaProcess.o:
 	nvcc -c -arch=sm_20 cudaProcess.cu
