@@ -1,7 +1,7 @@
 #include "cudaProcess.h"
 
 __global__
-void execCudaGrayscale(uchar* image, uchar* grayImage, int rows, int cols, int channels, int step) {
+void execCudaGrayscale(unsigned char* image, unsigned char* grayImage, int rows, int cols, int channels, int step) {
 
     int index = threadIdx.x;
     int stride = blockDim.x;
@@ -21,7 +21,7 @@ void execCudaGrayscale(uchar* image, uchar* grayImage, int rows, int cols, int c
 }
 
 __device__
-void cudaKernelSum(uchar* image, int rows, int cols, int channels, int step, int x, int y, int size, int* sum) {
+void cudaKernelSum(unsigned char* image, int rows, int cols, int channels, int step, int x, int y, int size, int* sum) {
     int numPixels = 0;
     for (int i = (x - (size/2)); i < (x + (size/2))+1; i++) {
         for (int j = (y - (size/2)); j < (y + (size/2))+1; j++) {
@@ -39,7 +39,7 @@ void cudaKernelSum(uchar* image, int rows, int cols, int channels, int step, int
 }
 
 __global__
-void execCudaBlur(uchar* image, uchar* blurImage, int rows, int cols, int channels, int step int size) {
+void execCudaBlur(unsigned char* image, unsigned char* blurImage, int rows, int cols, int channels, int step int size) {
 
     int index = threadIdx.x;
     int stride = blockDim.x;
@@ -61,16 +61,16 @@ void execCudaBlur(uchar* image, uchar* blurImage, int rows, int cols, int channe
 }
 
 __device__
-void cudaKernelLineDetect(Mat image, int x, int y, int* val) {
+void cudaKernelLineDetect(unsigned char image, int rows, int cols, int x, int y, int* val) {
     int sum = 0;
     int numPixels = 0;
     int kx = 0;
     for (int i = (x - 1); i < (x + 2); i++) {
         int ky = 0;
         for (int j = (y - 1); j < (y + 2); j++) {
-            if (i >= 0 && j >= 0 && i < image.cols && j < image.rows) {
+            if (i >= 0 && j >= 0 && i < cols && j < rows) {
                 for(int k = 0; k < 4; k ++) {
-                    sum += kernelArray[k][kx][ky] * image.at<uchar>(j, i);
+                    sum += kernelArray[k][kx][ky] * image[i + cols*j];
                 }
                 numPixels++;
             }
@@ -82,7 +82,7 @@ void cudaKernelLineDetect(Mat image, int x, int y, int* val) {
 }
 
 __global__
-Mat execCudaDetectLine(uchar* image, uchar* lineImage, int rows, int cols, int channels, int step) {
+Mat execCudaDetectLine(unsigned char* image, unsigned char* lineImage, int rows, int cols, int channels, int step) {
     //Assuming gray image input
 
     int index = threadIdx.x;
@@ -100,7 +100,7 @@ Mat execCudaDetectLine(uchar* image, uchar* lineImage, int rows, int cols, int c
     }
 }
 
-uchar* cudaGrayscale(uchar* image, int rows, int cols, int channels, int step) {
+uchar* cudaGrayscale(unsigned char* image, int rows, int cols, int channels, int step) {
     
     uchar* cudaImage;
     uchar* cudaGrayImage;
