@@ -93,7 +93,7 @@ void execCudaDetectLine(unsigned char* image, unsigned char* lineImage, int rows
     // int stride = blockDim.x;
 
     //int numPixels = rows * cols;
-    int *val;
+    int *val = 0;
 
     //for(int i = index; i < numPixels; i+= stride) {
         int y = index / cols;
