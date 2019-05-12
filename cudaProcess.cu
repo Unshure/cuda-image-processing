@@ -103,8 +103,8 @@ unsigned char* cudaGrayscale(unsigned char* image, int rows, int cols, int chann
     
     unsigned char* cudaImage;
     unsigned char* cudaGrayImage;
-    cudaMallocManaged(cudaImage, sizeof(unsigned char)*rows*cols);
-    cudaMallocManaged(cudaGrayImage, sizeof(unsigned char)*rows*cols*channels);
+    cudaMallocManaged(&cudaImage, sizeof(unsigned char)*rows*cols);
+    cudaMallocManaged(&cudaGrayImage, sizeof(unsigned char)*rows*cols*channels);
     
     memcpy(cudaImage, image, sizeof(unsigned char)*rows*cols*channels);
     memset(cudaGrayImage, 0, sizeof(unsigned char)*rows*cols);
@@ -125,8 +125,8 @@ unsigned char* cudaBlur(unsigned char* image, int rows, int cols, int channels, 
 
     unsigned char* cudaImage;
     unsigned char* cudaBlurImage;
-    cudaMallocManaged(cudaImage, sizeof(unsigned char)*rows*cols*channels);
-    cudaMallocManaged(cudaBlurImage, sizeof(unsigned char)*rows*cols*channels);
+    cudaMallocManaged(&cudaImage, sizeof(unsigned char)*rows*cols*channels);
+    cudaMallocManaged(&cudaBlurImage, sizeof(unsigned char)*rows*cols*channels);
 
     memcpy(cudaImage, image, sizeof(unsigned char)*rows*cols*channels);
     memset(cudaBlurImage, 0, sizeof(unsigned char)*rows*cols*channels);
@@ -149,8 +149,8 @@ unsigned char* cudaDetectLine(unsigned char* image, int rows, int cols, int chan
 
     unsigned char* cudaImage;
     unsigned char* cudaLineImage;
-    cudaMallocManaged(cudaImage, sizeof(unsigned char)*rows*cols);
-    cudaMallocManaged(cudaLineImage, sizeof(unsigned char)*rows*cols);
+    cudaMallocManaged(&cudaImage, sizeof(unsigned char)*rows*cols);
+    cudaMallocManaged(&cudaLineImage, sizeof(unsigned char)*rows*cols);
 
     memcpy(cudaImage, grayImage, sizeof(unsigned char)*rows*cols)
     memset(cudaLineImage, 0, sizeof(unsigned char)*rows*cols);
