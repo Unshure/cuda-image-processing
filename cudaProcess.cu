@@ -160,6 +160,8 @@ unsigned char* cudaDetectLine(unsigned char* image, int rows, int cols, int chan
 
     unsigned char* grayImage = cudaGrayscale(image, rows, cols, channels, step);
 
+    return grayImage;
+/*
     unsigned char* cudaImage;
     unsigned char* cudaLineImage;
     cudaMallocManaged(&cudaImage, sizeof(unsigned char)*rows*cols);
@@ -177,5 +179,5 @@ unsigned char* cudaDetectLine(unsigned char* image, int rows, int cols, int chan
     cudaFree(cudaImage);
     cudaFree(cudaLineImage);
     return lineImage;
-
+*/
 }
