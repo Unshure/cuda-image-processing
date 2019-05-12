@@ -1,10 +1,10 @@
 #ifndef CUDAPROCESS_H
 #define CUDAPROCESS_H
 
-uchar* cudaGrayscale(uchar* image, int rows, int cols, int channels, int step);
+unsigned char* cudaGrayscale(unsigned char*, int, int, int, int);
 
-uchar* cudaBlur(uchar* image, int rows, int cols, int channels, int step, int size);
+unsigned char* cudaBlur(unsigned char*, int, int, int, int, int);
 
-uchar* cudaDetectLine(uchar* image, int rows, int cols, int channels, int step);
+unsigned char* cudaDetectLine(unsigned char*, int, int, int, int);
 
 #endif
