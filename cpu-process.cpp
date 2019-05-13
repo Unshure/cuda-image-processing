@@ -36,7 +36,7 @@ int main(int argc, char** argv )
         unsigned char* grayImageData = grayscale(image.data, image.rows, image.cols, image.channels(), image.step);
         processedImage = Mat(image.rows, image.cols, CV_8UC1, grayImageData);
         
-    }   else if (strcmp(argv[2], "-b") == 0 && argc == 4) {
+    }   else if (strcmp(argv[2], "-b") == 0 && argc == 4 && atoi(argv[3]) >= 0) {
         unsigned char* blurImageData = blur(image.data, image.rows, image.cols, image.channels(), image.step, atoi(argv[3]));
         processedImage = Mat(image.rows, image.cols, CV_8UC3, blurImageData);
 
@@ -50,7 +50,7 @@ int main(int argc, char** argv )
                 processedImage = Mat(image.rows, image.cols, CV_8UC1, grayImageData);
 
                 
-            }   else if (strcmp(argv[3], "-b") == 0 && argc == 5) {
+            }   else if (strcmp(argv[3], "-b") == 0 && argc == 5 && atoi(argv[4]) >= 0) {
                 unsigned char* blurImageData = cudaBlur(image.data, image.rows, image.cols, image.channels(), image.step, atoi(argv[4]));
                 processedImage = Mat(image.rows, image.cols, CV_8UC3, blurImageData);
 
@@ -59,7 +59,7 @@ int main(int argc, char** argv )
                 return 0;
             }*/
     }   else {
-        printf("Missing tag\n");
+        printf("Missing or wrong tag\n");
         return 0;
     }
 
